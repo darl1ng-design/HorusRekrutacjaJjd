@@ -12,18 +12,21 @@ public class FileCabinet implements Cabinet{
 
     @Override
     public Optional<Folder> findFolderByName(String name) {
-        String normalized = Util.normalize(name);
-        if(normalized == null) return Optional.empty();
+        String normalizedName = Util.normalize(name);
+        if(normalizedName == null || folders == null) return Optional.empty();
 
-        return folders.stream()
-                .filter(
-                        folder -> folder.getName().equals(name))
-                .findFirst();
+      return folders.stream()
+              .filter(folder -> folder.getName().equals(name))
+              .findFirst();
     }
 
     @Override
     public List<Folder> findFoldersBySize(String size) {
-        return List.of();
+        String normalizedSize = Util.assertAllowedSize(Util.normalize(size));
+
+        return folders.stream()
+                .filter(folders -> folders.getSize().equals(normalizedSize))
+                .toList();
     }
 
     @Override
