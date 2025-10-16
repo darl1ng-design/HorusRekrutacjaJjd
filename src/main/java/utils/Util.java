@@ -12,7 +12,7 @@ public class Util {
     public static String assertAllowedSize(String input){
         return switch(input) {
             case "small", "medium", "large" -> input;
-            default -> throw new IllegalArgumentException("Invalid folder size.");
+            case null, default -> throw new IllegalArgumentException("Invalid folder size.");
         };
     }
 }
