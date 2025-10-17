@@ -35,9 +35,7 @@ public class FileCabinet implements Cabinet, MultiFolder{
 
     @Override
     public int count() {
-        int counter = 0;
-        for(Folder f : folders) counter ++;
-        return counter;
+        return folders == null ? 0 : folders.size();
     }
 
     @Override
