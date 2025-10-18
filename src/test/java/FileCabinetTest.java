@@ -17,7 +17,7 @@ import java.util.Optional;
  * <p>All tests use the JUnit framework and rely on pre-initialized data
  * defined in the {@link #setup()} method.</p>
  *
- * @author Adam
+ * @author Adam Gyurjyan
  * @version 1.0
  * @since 1.0
  * @see FileCabinet
