@@ -43,7 +43,7 @@ public class FileCabinetTest {
     }
 
     @Test
-    void testShouldFindFOlderByNameReturnExpected(){
+    void testShouldFindFolderByNameReturnExpected(){
         String inputFolderName = "Test1";
         Optional<Folder> temp = fileCabinet.findFolderByName(inputFolderName);
         Assertions.assertTrue(temp.isPresent(), "Ok");
