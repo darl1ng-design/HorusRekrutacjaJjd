@@ -1,3 +1,6 @@
+import lombok.ToString;
+
+@ToString
 public class FolderImpl implements Folder{
     private String name;
     private String size;
@@ -17,11 +20,4 @@ public class FolderImpl implements Folder{
         return size.toLowerCase();
     }
 
-    @Override
-    public String toString() {
-        return "FolderImpl{" +
-                "name='" + name + '\'' +
-                ", size='" + size + '\'' +
-                '}';
-    }
 }
