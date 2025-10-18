@@ -73,8 +73,6 @@ public class FileCabinetTest {
     }
 
     @Test
-    @DisplayName("FindFolderBySoze() should throw IllegalArgumentException when " +
-            "size is null and size is not small, medium or large")
     void testFindFoldersBySizeWhenNotAllowedArguments(){
         String inputSize_1 = null;
         String inputSize_2 = "NotSmallOrMediumOrLarge";
