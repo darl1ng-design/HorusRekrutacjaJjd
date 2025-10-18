@@ -43,15 +43,22 @@ public class FileCabinetTest {
     }
 
     @Test
-    void testShouldFindFolderByNameReturnExpected(){
+    void testFindFoldersByNameWhenAllowedArguments(){
         String inputFolderName = "Test1";
         Optional<Folder> temp = fileCabinet.findFolderByName(inputFolderName);
-        Assertions.assertTrue(temp.isPresent(), "Ok");
-        Assertions.assertEquals("test1", temp.get().getName());
+        Assertions.assertTrue(temp.isPresent());
+        Assertions.assertEquals("Test1", temp.get().getName());
     }
 
     @Test
-    void ShouldFindFolderBySizeReturnExpected(){
+    void testFindFoldersByNameWhenNotAllowedArguments(){
+        String inputName = null;
+        Optional<Folder> temp = fileCabinet.findFolderByName(inputName);
+        Assertions.assertTrue(temp.isEmpty());
+    }
+
+    @Test
+    void testFindFoldersBySizeWhenAllowedArguments(){
         String inputSize_1 = "small";
         String inputSize_2 = "medium";
         String inputSize_3 = "large";
@@ -66,7 +73,9 @@ public class FileCabinetTest {
     }
 
     @Test
-    void shouldFindFolderBySizeThrowException(){
+    @DisplayName("FindFolderBySoze() should throw IllegalArgumentException when " +
+            "size is null and size is not small, medium or large")
+    void testFindFoldersBySizeWhenNotAllowedArguments(){
         String inputSize_1 = null;
         String inputSize_2 = "NotSmallOrMediumOrLarge";
 
@@ -83,4 +92,12 @@ public class FileCabinetTest {
         Assertions.assertEquals("Invalid folder size.", temp_1.getMessage());
         Assertions.assertEquals("Invalid folder size.", temp_2.getMessage());
     }
+
+    @Test
+    void testCountWhenFoldersIsNull(){
+        fileCabinet.setFolders(null);
+        Assertions.assertEquals(0, fileCabinet.count());
+    }
+
+
 }
