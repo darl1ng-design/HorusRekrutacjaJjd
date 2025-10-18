@@ -30,13 +30,14 @@
  * }</pre>
  */
 
+import lombok.Setter;
 import utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@Setter
 public class FileCabinet implements Cabinet, MultiFolder{
     private List<Folder> folders = new ArrayList<>();
     private String name;
