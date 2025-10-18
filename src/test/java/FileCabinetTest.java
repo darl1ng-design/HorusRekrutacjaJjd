@@ -1,28 +1,3 @@
-/**
- * Unit test suite for the {@link FileCabinet} class.
- * <p>
- * This class verifies the correctness of folder retrieval and counting logic within
- * {@code FileCabinet}. It uses {@link org.junit.jupiter.api.Test JUnit} to ensure that
- * the implementation behaves consistently under various conditions.
- * </p>
- *
- * <p><strong>Test coverage includes:</strong></p>
- * <ul>
- *   <li>{@link FileCabinet#findFolderByName(String)} – verifies correct folder retrieval
- *       for valid names and proper handling of {@code null} input.</li>
- *   <li>{@link FileCabinet#findFoldersBySize(String)} – ensures that folders are filtered
- *       correctly by size and that invalid arguments throw {@link IllegalArgumentException}.</li>
- *   <li>{@link FileCabinet#count()} – checks accurate folder count for {@code null},
- *       empty, and populated folder lists.</li>
- * </ul>
- *
- * <p>
- * Each test initializes a {@link FileCabinet} instance containing several {@link FolderImpl}
- * objects with different sizes and names. The {@link #setup()} method runs before each test to
- * guarantee a clean, consistent state.
- * </p>
- */
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,11 +7,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Test suite for the {@link FileCabinet} class.
+ *
+ * <p>This class contains unit tests verifying the correct behavior of the
+ * {@link FileCabinet} methods, including folder lookup by name, filtering by size,
+ * and folder count operations.</p>
+ *
+ * <p>All tests use the JUnit framework and rely on pre-initialized data
+ * defined in the {@link #setup()} method.</p>
+ *
+ * @author Adam
+ * @version 1.0
+ * @since 1.0
+ * @see FileCabinet
+ * @see Folder
+ * @see FolderImpl
+ */
 @DisplayName("Test container for FileCabinet class")
 public class FileCabinetTest {
 
     private FileCabinet fileCabinet;
 
+    /**
+     * Initializes a {@link FileCabinet} instance with a predefined list of folders
+     * before each test case.
+     *
+     * <p>The test data includes five {@link FolderImpl} objects with various
+     * names and sizes.</p>
+     */
     @BeforeEach
     void setup(){
         fileCabinet = new FileCabinet(
@@ -52,6 +51,13 @@ public class FileCabinetTest {
         );
     }
 
+    /**
+     * Verifies that {@link FileCabinet#findFolderByName(String)} correctly finds
+     * a folder when given a valid name.
+     *
+     * <p>Checks that the result is present and that the name matches the expected
+     * normalized value.</p>
+     */
     @Test
     void testFindFoldersByNameWhenAllowedArguments(){
         String inputFolderName = "Test1";
@@ -60,6 +66,10 @@ public class FileCabinetTest {
         Assertions.assertEquals("test1", temp.get().getName());
     }
 
+    /**
+     * Verifies that {@link FileCabinet#findFolderByName(String)} returns an empty
+     * {@link Optional} when provided with a null name.
+     */
     @Test
     void testFindFoldersByNameWhenNotAllowedArguments(){
         String inputName = null;
@@ -67,6 +77,12 @@ public class FileCabinetTest {
         Assertions.assertTrue(temp.isEmpty());
     }
 
+    /**
+     * Tests {@link FileCabinet#findFoldersBySize(String)} with valid size arguments.
+     *
+     * <p>Ensures that folders of size {@code "small"}, {@code "medium"}, and {@code "large"}
+     * are correctly filtered and returned.</p>
+     */
     @Test
     void testFindFoldersBySizeWhenAllowedArguments(){
         String inputSize_1 = "small";
@@ -82,6 +98,12 @@ public class FileCabinetTest {
         Assertions.assertEquals("large", temp_3.getFirst().getSize());
     }
 
+    /**
+     * Verifies that {@link FileCabinet#findFoldersBySize(String)} throws an
+     * {@link IllegalArgumentException} for invalid or null size values.
+     *
+     * <p>Confirms that the exception messages are consistent and descriptive.</p>
+     */
     @Test
     void testFindFoldersBySizeWhenNotAllowedArguments(){
         String inputSize_1 = null;
@@ -101,18 +123,30 @@ public class FileCabinetTest {
         Assertions.assertEquals("Invalid folder size.", temp_2.getMessage());
     }
 
+    /**
+     * Ensures that {@link FileCabinet#count()} returns {@code 0}
+     * when the internal folder list is {@code null}.
+     */
     @Test
     void testCountWhenFoldersIsNull(){
         fileCabinet.setFolders(null);
         Assertions.assertEquals(0, fileCabinet.count());
     }
 
+    /**
+     * Ensures that {@link FileCabinet#count()} returns {@code 0}
+     * when the internal folder list is empty.
+     */
     @Test
     void testCountWhenFoldersIsEmpty(){
         fileCabinet.setFolders(new ArrayList<>());
         Assertions.assertEquals(0, fileCabinet.count());
     }
 
+    /**
+     * Ensures that {@link FileCabinet#count()} returns the correct number
+     * of folders when the list is populated.
+     */
     @Test
     void testCountWhenFoldersIsNotEmpty(){
         Assertions.assertEquals(fileCabinet.getFolders().size(), fileCabinet.count());
