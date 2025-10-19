@@ -20,9 +20,8 @@ import java.util.stream.Stream;
  * @see Cabinet
  * @see MultiFolder
  */
-
-@Setter
 public class FileCabinet implements Cabinet, MultiFolder {
+    @Setter
     private List<Folder> folders;
     private String name;
     private String size;

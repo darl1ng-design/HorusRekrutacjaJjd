@@ -1,6 +1,3 @@
-import lombok.ToString;
-
-@ToString
 public class FolderImpl implements Folder{
     private String name;
     private String size;
