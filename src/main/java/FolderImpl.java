@@ -16,5 +16,4 @@ public class FolderImpl implements Folder{
     public String getSize() {
         return size.toLowerCase();
     }
-
 }
