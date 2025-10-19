@@ -22,9 +22,9 @@ import java.util.Optional;
  * @see Cabinet
  * @see MultiFolder
  */
-@Setter
+
 public class FileCabinet implements Cabinet, MultiFolder{
-    private List<Folder> folders = new ArrayList<>();
+    private List<Folder> folders;
     private String name;
     private String size;
 
@@ -38,7 +38,7 @@ public class FileCabinet implements Cabinet, MultiFolder{
      *           collection do not affect this instance.
      */
     public FileCabinet(List<Folder> folders, String name, String size) {
-        this.folders.addAll(folders);
+        this.folders = folders == null ? List.of() : new ArrayList<>();
         this.name = name;
         this.size = size;
     }
