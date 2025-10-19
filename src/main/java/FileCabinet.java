@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Represents a file cabinet containing multiple folders with a specific name and size.
@@ -54,8 +56,8 @@ public class FileCabinet implements Cabinet, MultiFolder {
         String normalizedName = normalize(name);
         if (normalizedName == null) return Optional.empty();
 
-        return folders.stream()
-                .filter(folder -> folder.getName().equals(normalizedName))
+        return streamAllElements(folders)
+                .filter(folder -> normalizedName.equals(normalize(folder.getName())))
                 .findFirst();
     }
 
@@ -70,8 +72,8 @@ public class FileCabinet implements Cabinet, MultiFolder {
     @Override
     public List<Folder> findFoldersBySize(String size) {
         String normalizedSize = assertAllowedSize(size);
-        return folders.stream()
-                .filter(folders -> folders.getSize().equals(normalizedSize))
+        return streamAllElements(folders)
+                .filter(folders -> normalizedSize.equals(assertAllowedSize(folders.getSize())))
                 .toList();
     }
 
@@ -82,7 +84,7 @@ public class FileCabinet implements Cabinet, MultiFolder {
      */
     @Override
     public int count() {
-        return folders == null ? 0 : folders.size();
+        return (int) streamAllElements(folders).count();
     }
 
     /**
@@ -116,6 +118,22 @@ public class FileCabinet implements Cabinet, MultiFolder {
     }
 
 
+    private Stream<Folder> streamAllElements(List<Folder> list){
+        if(list == null) return Stream.empty();
+        return list.stream()
+                .filter(Objects::nonNull)
+                .flatMap(f -> {
+                    if(f instanceof MultiFolder multiFolder){
+                        return Stream.concat(
+                                Stream.of(f),
+                                streamAllElements(multiFolder.getFolders())
+                        );
+                    }
+                    else return Stream.of(f);
+                });
+    }
+
+
     /**
      * Normalizes a string by trimming whitespace and converting it to lowercase.
      *
@@ -126,7 +144,7 @@ public class FileCabinet implements Cabinet, MultiFolder {
      * @return the normalized string in lowercase, or {@code null} if input is {@code null} or blank
      * @implNote This method is commonly used to make string comparisons case-insensitive.
      */
-    public String normalize(String input) {
+    private String normalize(String input) {
         if (input == null) return null;
         String trimmed = input.trim();
         return trimmed.isEmpty() ? null : trimmed.toLowerCase();
@@ -144,7 +162,7 @@ public class FileCabinet implements Cabinet, MultiFolder {
      * @throws IllegalArgumentException if the input is {@code null} or not one of the allowed values
      * @implSpec This method uses a {@code switch} expression for compactness and strict validation.
      */
-    public String assertAllowedSize(String input) {
+    private String assertAllowedSize(String input) {
         String normalized = normalize(input);
         if(normalized == null) throw new IllegalArgumentException("Invalid folder size.");
         return switch (input) {
