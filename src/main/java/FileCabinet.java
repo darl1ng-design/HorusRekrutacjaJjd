@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import lombok.Setter;
+
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -22,52 +21,53 @@ import java.util.stream.Stream;
  * @see MultiFolder
  */
 
+@Setter
 public class FileCabinet implements Cabinet, MultiFolder {
     private List<Folder> folders;
     private String name;
     private String size;
 
     /**
-     * Creates a new instance of the file cabinet with the given folders, name, and size.
+     * Creates a new {@link FileCabinet} with the specified folders, name, and size.
      *
-     * @param folders list of folders to be added to the cabinet
-     * @param name    the cabinet name
+     * <p>If the provided folder list is {@code null}, an empty list is used instead.</p>
+     *
+     * @param folders the list of folders to include in this cabinet (may be {@code null})
+     * @param name    the name of the cabinet
      * @param size    the cabinet size (e.g. {@code "small"}, {@code "medium"}, {@code "large"})
-     * @implNote The provided list is copied, so later modifications to the original
-     * collection do not affect this instance.
      */
     public FileCabinet(List<Folder> folders, String name, String size) {
-        this.folders = folders == null ? List.of() : new ArrayList<>();
+        this.folders = folders == null ? List.of() : new ArrayList<>(folders);
         this.name = name;
         this.size = size;
     }
 
     /**
-     * Finds a folder by its name.
+     * Finds the first folder with the given name, including nested ones.
      *
-     * @param name the name of the folder to find
-     * @return an {@link Optional} containing the folder if found, or empty if not found
-     * @implSpec The method normalizes the provided name using {normalize(String)}
-     * and compares it to folder names within the internal collection.
-     * @apiNote The result may be case-insensitive if {@code normalize} removes capitalization differences.
+     * <p>The comparison is case-insensitive and ignores leading or trailing spaces.</p>
+     *
+     * @param name the folder name to search for
+     * @return an {@link Optional} containing the found folder, or empty if not found
      */
     @Override
     public Optional<Folder> findFolderByName(String name) {
         String normalizedName = normalize(name);
         if (normalizedName == null) return Optional.empty();
-
         return streamAllElements(folders)
                 .filter(folder -> normalizedName.equals(normalize(folder.getName())))
                 .findFirst();
     }
 
     /**
-     * Returns a list of folders with the specified size.
+     * Finds all folders that match the given size, including nested ones.
      *
-     * @param size the size to filter by (e.g. {@code "small"}, {@code "medium"}, {@code "large"})
-     * @return a list of folders matching the given size; may be empty but never {@code null}
-     * @throws IllegalArgumentException if the provided size is not allowed
-     * @implNote The method validates the size using {assertAllowedSize(String input)}
+     * <p>Only sizes {@code "small"}, {@code "medium"}, and {@code "large"}
+     * are allowed. The search is case-insensitive.</p>
+     *
+     * @param size the folder size to filter by
+     * @return a list of all matching folders; may be empty but never {@code null}
+     * @throws IllegalArgumentException if the size is {@code null}, blank, or invalid
      */
     @Override
     public List<Folder> findFoldersBySize(String size) {
@@ -78,9 +78,12 @@ public class FileCabinet implements Cabinet, MultiFolder {
     }
 
     /**
-     * Returns the number of folders stored in this cabinet.
+     * Counts all folders in this cabinet, including nested ones.
      *
-     * @return the folder count, or {@code 0} if the list is empty or uninitialized
+     * <p>Uses {@link #streamAllElements(List)} to traverse every folder
+     * and returns the total number of elements.</p>
+     *
+     * @return the total number of folders (0 if none)
      */
     @Override
     public int count() {
@@ -88,9 +91,11 @@ public class FileCabinet implements Cabinet, MultiFolder {
     }
 
     /**
-     * Returns all folders contained in this cabinet.
+     * Returns an unmodifiable copy of all folders in this cabinet.
      *
-     * @return a list of folders (never {@code null})
+     * <p>Prevents external modification of the internal folder list.</p>
+     *
+     * @return an unmodifiable list of folders
      */
     @Override
     public List<Folder> getFolders() {
@@ -117,32 +122,42 @@ public class FileCabinet implements Cabinet, MultiFolder {
         return size;
     }
 
-
+    /**
+     * Creates a flat stream of all {@link Folder} elements from the given list.
+     *
+     * <p>If a folder is an instance of {@link MultiFolder}, its inner folders are
+     * also included in the result by recursive traversal.</p>
+     *
+     * <p>Returns an empty stream if the input list is {@code null} and skips any
+     * {@code null} elements.</p>
+     *
+     * @param list the list of folders to process, possibly containing nested ones
+     * @return a flat {@link Stream} of all non-null folders
+     */
     private Stream<Folder> streamAllElements(List<Folder> list){
         if(list == null) return Stream.empty();
         return list.stream()
                 .filter(Objects::nonNull)
-                .flatMap(f -> {
-                    if(f instanceof MultiFolder multiFolder){
+                .flatMap(folder -> {
+                    if(folder instanceof MultiFolder multiFolder){
                         return Stream.concat(
-                                Stream.of(f),
+                                Stream.of(folder),
                                 streamAllElements(multiFolder.getFolders())
                         );
                     }
-                    else return Stream.of(f);
+                    else return Stream.of(folder);
                 });
     }
 
 
     /**
-     * Normalizes a string by trimming whitespace and converting it to lowercase.
+     * Trims and lowercases the given string.
      *
-     * <p>If the input is {@code null} or contains only whitespace,
+     * <p>If the input is {@code null} or blank after trimming,
      * the method returns {@code null}.</p>
      *
-     * @param input the input string to normalize
-     * @return the normalized string in lowercase, or {@code null} if input is {@code null} or blank
-     * @implNote This method is commonly used to make string comparisons case-insensitive.
+     * @param input the string to normalize
+     * @return a lowercase, trimmed string, or {@code null} if input is null or blank
      */
     private String normalize(String input) {
         if (input == null) return null;
@@ -152,15 +167,14 @@ public class FileCabinet implements Cabinet, MultiFolder {
 
 
     /**
-     * Validates whether the provided folder size value is allowed.
+     * Validates and normalizes the given folder size value.
      *
-     * <p>Permitted values are {@code "small"}, {@code "medium"}, and {@code "large"}.
-     * If the value is {@code null}, the method throws an {@link IllegalArgumentException}.</p>
+     * <p>Accepts only {@code "small"}, {@code "medium"}, or {@code "large"}
+     * (case-insensitive). Any other value causes an {@link IllegalArgumentException}.</p>
      *
-     * @param input the folder size value to validate
-     * @return the normalized input value if it is valid
-     * @throws IllegalArgumentException if the input is {@code null} or not one of the allowed values
-     * @implSpec This method uses a {@code switch} expression for compactness and strict validation.
+     * @param input the folder size to validate
+     * @return the normalized size string if valid
+     * @throws IllegalArgumentException if the input is {@code null}, blank, or invalid
      */
     private String assertAllowedSize(String input) {
         String normalized = normalize(input);
