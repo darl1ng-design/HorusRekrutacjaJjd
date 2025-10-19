@@ -28,7 +28,6 @@ import java.util.Optional;
 public class FileCabinetTest {
 
     private FileCabinet fileCabinet;
-
     /**
      * Initializes a {@link FileCabinet} instance with a predefined list of folders
      * before each test case.
