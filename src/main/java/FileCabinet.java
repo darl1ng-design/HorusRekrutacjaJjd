@@ -95,7 +95,7 @@ public class FileCabinet implements Cabinet, MultiFolder{
      */
     @Override
     public List<Folder> getFolders() {
-        return folders;
+        return List.copyOf(folders);
     }
 
     /**
