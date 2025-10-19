@@ -45,14 +45,14 @@ public class FileCabinet implements Cabinet, MultiFolder {
      *
      * @param name the name of the folder to find
      * @return an {@link Optional} containing the folder if found, or empty if not found
-     * @implSpec The method normalizes the provided name using {@link utils.Util#normalize(String)}
+     * @implSpec The method normalizes the provided name using {normalize(String)}
      * and compares it to folder names within the internal collection.
      * @apiNote The result may be case-insensitive if {@code normalize} removes capitalization differences.
      */
     @Override
     public Optional<Folder> findFolderByName(String name) {
-        String normalizedName = Util.normalize(name);
-        if (normalizedName == null || folders == null) return Optional.empty();
+        String normalizedName = normalize(name);
+        if (normalizedName == null) return Optional.empty();
 
         return folders.stream()
                 .filter(folder -> folder.getName().equals(normalizedName))
@@ -65,11 +65,11 @@ public class FileCabinet implements Cabinet, MultiFolder {
      * @param size the size to filter by (e.g. {@code "small"}, {@code "medium"}, {@code "large"})
      * @return a list of folders matching the given size; may be empty but never {@code null}
      * @throws IllegalArgumentException if the provided size is not allowed
-     * @implNote The method validates the size using {@link utils.Util#assertAllowedSize(String)}.
+     * @implNote The method validates the size using {assertAllowedSize(String input)}
      */
     @Override
     public List<Folder> findFoldersBySize(String size) {
-        String normalizedSize = Util.assertAllowedSize(Util.normalize(size));
+        String normalizedSize = assertAllowedSize(size);
         return folders.stream()
                 .filter(folders -> folders.getSize().equals(normalizedSize))
                 .toList();
